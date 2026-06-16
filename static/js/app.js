@@ -24,6 +24,7 @@ const elements = {
     filterChipsContainer: document.getElementById('filter-chips-container'),
     resultsCount: document.getElementById('results-count'),
     sortSelect: document.getElementById('sort-select'),
+    exportCsvButton: document.getElementById('export-csv-button'),
     timelineContainer: document.getElementById('timeline-container'),
     toastContainer: document.getElementById('toast-container')
 };
@@ -56,6 +57,9 @@ function setupEventListeners() {
 
     // Refresh Button
     elements.refreshButton.addEventListener('click', triggerManualRefresh);
+
+    // Export CSV Button
+    elements.exportCsvButton.addEventListener('click', exportToCSV);
 
     // Search Input
     elements.searchInput.addEventListener('input', (e) => {
@@ -321,6 +325,29 @@ function renderTimeline() {
             badgeEl.className = `badge ${badgeClass}`;
             badgeEl.textContent = item.type;
             
+            // Action Buttons Container
+            const actionsEl = document.createElement('div');
+            actionsEl.className = 'release-item-actions';
+
+            // Copy Button
+            const copyBtn = document.createElement('button');
+            copyBtn.className = 'copy-card-button';
+            copyBtn.title = 'Copy text to clipboard';
+            copyBtn.innerHTML = `
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+                <span>Copy</span>
+            `;
+            copyBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const plainText = item.content.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+                navigator.clipboard.writeText(`BigQuery Release (${rel.date}) - [${item.type}]: ${plainText}`).then(() => {
+                    showToast('Copied to clipboard!');
+                });
+            });
+
             // Tweet Button
             const tweetBtn = document.createElement('button');
             tweetBtn.className = 'tweet-button';
@@ -336,8 +363,11 @@ function renderTimeline() {
                 shareOnTwitter(rel.date, item.type, item.content, rel.link);
             });
             
+            actionsEl.appendChild(copyBtn);
+            actionsEl.appendChild(tweetBtn);
+            
             itemHeader.appendChild(badgeEl);
-            itemHeader.appendChild(tweetBtn);
+            itemHeader.appendChild(actionsEl);
             cardEl.appendChild(itemHeader);
 
             const contentEl = document.createElement('div');
@@ -469,4 +499,61 @@ function shareOnTwitter(date, type, htmlContent, officialLink) {
     const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(shareUrl)}`;
     window.open(twitterUrl, '_blank');
     showToast('Opening Twitter composition window...');
+}
+
+// Export the currently filtered release notes to a CSV file
+function exportToCSV() {
+    if (!state.filteredReleases || state.filteredReleases.length === 0) {
+        showToast('No releases to export!', 'error');
+        return;
+    }
+    
+    let csvContent = "\ufeffDate,Type,Content,Link\n"; // Add UTF-8 BOM
+    
+    state.filteredReleases.forEach(rel => {
+        rel.items.forEach(item => {
+            const plainContent = item.content.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+            
+            const row = [
+                escapeCSVField(rel.date),
+                escapeCSVField(item.type),
+                escapeCSVField(plainContent),
+                escapeCSVField(rel.link)
+            ];
+            
+            csvContent += row.join(",") + "\n";
+        });
+    });
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    
+    let filename = "bigquery_release_notes";
+    if (state.activeFilter !== 'all') {
+        filename += `_${state.activeFilter.toLowerCase()}`;
+    }
+    if (state.searchQuery) {
+        filename += `_search`;
+    }
+    filename += ".csv";
+    
+    link.setAttribute("download", filename);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    showToast('Exported CSV successfully!');
+}
+
+// Helper to escape double quotes and wrap cells in quotes for CSV formats
+function escapeCSVField(field) {
+    if (field === null || field === undefined) return '';
+    let stringValue = String(field);
+    if (stringValue.includes('"') || stringValue.includes(',') || stringValue.includes('\n') || stringValue.includes('\r')) {
+        return `"${stringValue.replace(/"/g, '""')}"`;
+    }
+    return stringValue;
 }

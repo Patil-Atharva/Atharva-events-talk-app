@@ -930,8 +930,8 @@ a:hover {
     }
 }
 
-/* Tweet Button */
-.tweet-button {
+/* Card Action Buttons (Tweet & Copy) */
+.tweet-button, .copy-card-button {
     background-color: var(--bg-color);
     border: 1px solid var(--border-color);
     color: var(--text-color);
@@ -947,13 +947,53 @@ a:hover {
     transition: all var(--transition-fast);
 }
 
-.tweet-button:hover {
+.tweet-button:hover, .copy-card-button:hover {
     background-color: var(--text-color);
     color: var(--bg-color);
     border-color: var(--text-color);
 }
 
-.tweet-button svg {
+.tweet-button svg, .copy-card-button svg {
     width: 11px;
     height: 11px;
+}
+
+.release-item-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+/* Export CSV Button & Feed Actions Container */
+.feed-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.export-button {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    font-family: var(--font-family);
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0.35rem 0.85rem;
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all var(--transition-fast);
+}
+
+.export-button:hover {
+    background-color: var(--primary-light);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.export-button svg {
+    width: 14px;
+    height: 14px;
 }
