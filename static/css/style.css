@@ -585,13 +585,20 @@ a:hover {
 }
 
 .timeline-date-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: var(--bg-color);
     font-size: 0.95rem;
     font-weight: 700;
     color: var(--text-color);
-    padding-left: 0.5rem;
+    padding: 0.5rem;
+    margin-top: -0.25rem;
+    margin-bottom: 0.25rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    transition: background-color var(--transition-normal);
 }
 
 .timeline-date-link {
