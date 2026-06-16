@@ -917,6 +917,17 @@ a:hover {
     }
 }
 
+@media (max-width: 480px) {
+    .tweet-button span, .copy-card-button span, .timeline-date-link span {
+        display: none;
+    }
+    
+    .tweet-button, .copy-card-button {
+        padding: 0.3rem 0.4rem;
+        justify-content: center;
+    }
+}
+
 /* Spinner Animation & Refresh Button */
 .refresh-icon {
     width: 18px;
