@@ -125,6 +125,7 @@ async function fetchReleases(force = false) {
             
             updateAPIStatus('connected', 'Live / Synced');
             calculateDashboardMetrics(state.allReleases);
+            updateFilterChipCounts();
             applyFilters(); // Initial render
             
             if (force) {
@@ -193,6 +194,43 @@ function calculateDashboardMetrics(releases) {
     elements.valFeatures.textContent = featuresCount;
     elements.valBreaking.textContent = breakingCount;
     elements.valLatest.textContent = latestDateText;
+}
+
+// Update the category filter chips with dynamic item counts
+function updateFilterChipCounts() {
+    const counts = {
+        all: 0,
+        Feature: 0,
+        Change: 0,
+        Issue: 0,
+        Breaking: 0,
+        Announcement: 0
+    };
+    
+    state.allReleases.forEach(rel => {
+        rel.items.forEach(item => {
+            counts.all++;
+            if (counts.hasOwnProperty(item.type)) {
+                counts[item.type]++;
+            }
+        });
+    });
+    
+    // Update "All" chip
+    const allChip = document.querySelector('.chip[data-filter="all"]');
+    if (allChip) {
+        allChip.textContent = `All (${counts.all})`;
+    }
+    
+    // Update category chips
+    const categories = ['Feature', 'Change', 'Issue', 'Breaking', 'Announcement'];
+    categories.forEach(cat => {
+        const chip = document.querySelector(`.chip[data-filter="${cat}"]`);
+        if (chip) {
+            const dotClass = cat.toLowerCase();
+            chip.innerHTML = `<span class="dot ${dotClass}"></span>${cat} (${counts[cat] || 0})`;
+        }
+    });
 }
 
 // Combined Search & Filter Logic
