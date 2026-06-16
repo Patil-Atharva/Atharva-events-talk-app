@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BigQuery Release Notes Explorer</title>
+    
+    <!-- Meta tags for SEO -->
+    <meta name="description" content="Explore, search, and filter BigQuery release notes in a clean, modern, and interactive dashboard interface.">
+    <meta name="author" content="BigQuery Release Tracker">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header" id="main-header">
+            <div class="header-logo">
+                <svg viewBox="0 0 24 24" class="logo-icon" fill="none" stroke="currentColor" stroke-width="2">
+                    <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+                    <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+                    <path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"></path>
+                </svg>
+                <div class="logo-text">
+                    <h1>BigQuery Releases</h1>
+                    <span class="logo-tagline">Real-time Feed & Analytics</span>
+                </div>
+            </div>
+            
+            <div class="header-controls">
+                <div class="status-indicator">
+                    <span class="status-dot pulsing"></span>
+                    <span class="status-label" id="api-status">Connecting...</span>
+                </div>
+                
+                <button id="refresh-button" class="icon-button" aria-label="Refresh release notes">
+                    <svg class="refresh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
+                        <path d="M21 3v5h-5"></path>
+                        <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
+                        <path d="M3 21v-5h5"></path>
+                    </svg>
+                </button>
+                
+                <button id="theme-toggle" class="icon-button" aria-label="Toggle dark mode">
+                    <!-- Sun icon -->
+                    <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="4"></circle>
+                        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+                    </svg>
+                    <!-- Moon icon -->
+                    <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- KPI Metrics Dashboard -->
+        <section class="kpi-grid" id="kpi-dashboard">
+            <div class="kpi-card" id="kpi-total">
+                <div class="kpi-content">
+                    <span class="kpi-label">Total Releases</span>
+                    <h2 class="kpi-value" id="val-total">-</h2>
+                </div>
+                <div class="kpi-icon-wrapper blue">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 20h9M3 20v-8a2 2 0 0 1 2-2h4l2-3h4l2 3h4a2 2 0 0 1 2 2v8M3 20h3M21 20h-3M9 20h6"></path>
+                    </svg>
+                </div>
+            </div>
+            
+            <div class="kpi-card" id="kpi-features">
+                <div class="kpi-content">
+                    <span class="kpi-label">New Features</span>
+                    <h2 class="kpi-value" id="val-features">-</h2>
+                </div>
+                <div class="kpi-icon-wrapper green">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                    </svg>
+                </div>
+            </div>
+            
+            <div class="kpi-card" id="kpi-breaking">
+                <div class="kpi-content">
+                    <span class="kpi-label">Breaking / Issues</span>
+                    <h2 class="kpi-value" id="val-breaking">-</h2>
+                </div>
+                <div class="kpi-icon-wrapper red">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
+                        <line x1="12" y1="9" x2="12" y2="13"></line>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                </div>
+            </div>
+            
+            <div class="kpi-card" id="kpi-latest">
+                <div class="kpi-content">
+                    <span class="kpi-label">Latest Update</span>
+                    <h2 class="kpi-value" id="val-latest" style="font-size: 1.15rem; font-weight: 600; font-family: var(--font-family);">-</h2>
+                </div>
+                <div class="kpi-icon-wrapper purple">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Workspace: Controls + Feed -->
+        <main class="main-content">
+            <!-- Controls Panel -->
+            <div class="controls-panel card">
+                <div class="search-box">
+                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" id="search-input" placeholder="Search release notes (e.g. Gemini, Arrow, UDF)..." aria-label="Search release notes">
+                    <button id="clear-search" class="clear-button" style="display: none;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="filters-container">
+                    <span class="filter-label">Filter Type:</span>
+                    <div class="filter-chips" id="filter-chips-container">
+                        <button class="chip active" data-filter="all">All</button>
+                        <button class="chip" data-filter="Feature">
+                            <span class="dot feature"></span>Feature
+                        </button>
+                        <button class="chip" data-filter="Change">
+                            <span class="dot change"></span>Change
+                        </button>
+                        <button class="chip" data-filter="Issue">
+                            <span class="dot issue"></span>Issue
+                        </button>
+                        <button class="chip" data-filter="Breaking">
+                            <span class="dot breaking"></span>Breaking
+                        </button>
+                        <button class="chip" data-filter="Announcement">
+                            <span class="dot announcement"></span>Announcement
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feed Container -->
+            <div class="feed-section">
+                <!-- Feed Header -->
+                <div class="feed-header-meta">
+                    <div id="results-count">Showing all release notes</div>
+                    <div class="feed-sort">
+                        <label for="sort-select">Sort:</label>
+                        <select id="sort-select" class="custom-select">
+                            <option value="desc">Latest First</option>
+                            <option value="asc">Oldest First</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Feed Timeline -->
+                <div class="timeline-container" id="timeline-container">
+                    <!-- Skeleton Loader -->
+                    <div class="skeleton-group">
+                        <div class="skeleton-date"></div>
+                        <div class="skeleton-card">
+                            <div class="skeleton-line short"></div>
+                            <div class="skeleton-line"></div>
+                            <div class="skeleton-line"></div>
+                        </div>
+                    </div>
+                    <div class="skeleton-group">
+                        <div class="skeleton-date"></div>
+                        <div class="skeleton-card">
+                            <div class="skeleton-line short"></div>
+                            <div class="skeleton-line"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>BigQuery Release Notes Explorer &bull; Auto-syncing from Google Cloud RSS Feed</p>
+        </footer>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Custom JavaScript -->
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
