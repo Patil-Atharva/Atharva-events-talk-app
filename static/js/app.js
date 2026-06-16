@@ -25,6 +25,7 @@ const elements = {
     resultsCount: document.getElementById('results-count'),
     sortSelect: document.getElementById('sort-select'),
     exportCsvButton: document.getElementById('export-csv-button'),
+    backToTopButton: document.getElementById('back-to-top'),
     timelineContainer: document.getElementById('timeline-container'),
     toastContainer: document.getElementById('toast-container')
 };
@@ -60,6 +61,12 @@ function setupEventListeners() {
 
     // Export CSV Button
     elements.exportCsvButton.addEventListener('click', exportToCSV);
+
+    // Back to Top Button Click
+    elements.backToTopButton.addEventListener('click', scrollToTop);
+
+    // Scroll Event
+    window.addEventListener('scroll', handleScroll);
 
     // Search Input
     elements.searchInput.addEventListener('input', (e) => {
@@ -594,4 +601,21 @@ function escapeCSVField(field) {
         return `"${stringValue.replace(/"/g, '""')}"`;
     }
     return stringValue;
+}
+
+// Fade in/out Back to Top button on scroll
+function handleScroll() {
+    if (window.scrollY > 300) {
+        elements.backToTopButton.classList.add('visible');
+    } else {
+        elements.backToTopButton.classList.remove('visible');
+    }
+}
+
+// Scroll window back to top smoothly
+function scrollToTop() {
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
 }

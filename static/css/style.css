@@ -850,7 +850,7 @@ a:hover {
 /* Toast Container & Notification format */
 .toast-container {
     position: fixed;
-    bottom: 24px;
+    bottom: 80px;
     right: 24px;
     display: flex;
     flex-direction: column;
@@ -1014,4 +1014,44 @@ a:hover {
 .export-button svg {
     width: 14px;
     height: 14px;
+}
+
+/* Floating Back to Top Button */
+.back-to-top {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    box-shadow: var(--shadow-lg);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: opacity var(--transition-fast), visibility var(--transition-fast), transform var(--transition-fast), background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.back-to-top.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.back-to-top:hover {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    color: #ffffff;
+}
+
+.back-to-top svg {
+    width: 20px;
+    height: 20px;
 }
